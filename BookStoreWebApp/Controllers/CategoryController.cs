@@ -26,7 +26,8 @@ namespace BookStoreWebApp.Controllers
         {   
             if ( ModelState.IsValid ) {
                 _dbContext.Categories.Add(obj);
-                _dbContext.SaveChanges();   
+                _dbContext.SaveChanges();
+                TempData["success"] = "Category successfuly created.";
                 return RedirectToAction("Index");
             }
             return View();
@@ -50,6 +51,7 @@ namespace BookStoreWebApp.Controllers
             {
                 _dbContext.Categories.Update(obj);
                 _dbContext.SaveChanges();
+                TempData["success"] = "Category successfuly edited.";
                 return RedirectToAction("Index");
             }
             return View();
@@ -81,7 +83,8 @@ namespace BookStoreWebApp.Controllers
             }
                 _dbContext.Categories.Remove(obj);
                 _dbContext.SaveChanges();
-                return RedirectToAction("Index");
+            TempData["success"] = "Category successfuly deleted.";
+            return RedirectToAction("Index");
             
            
         }
