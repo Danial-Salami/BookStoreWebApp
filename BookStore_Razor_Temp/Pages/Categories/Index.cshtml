@@ -1,0 +1,60 @@
+﻿@page
+@model BookStore_Razor_Temp.Pages.Categories.IndexModel
+
+<div class="container">
+    <div class="row pt-4 pb-3 ">
+        <div class="col-6">
+            <h2> Category List</h2>
+        </div>
+        <div class="col-6 text-end ">
+            <a class="btn btn-success" asp-page="/categories/create">
+                <i class="bi bi-plus-circle"></i> Create Category
+            </a>
+        </div>
+    </div>
+
+
+
+<table class="table table-striped table-bordered" >
+    <thead>
+        <tr>
+            <th>
+                Category Name 
+            </th>
+            <th>
+                Display Order
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var obj in Model.CategoryList)
+        {
+        <tr>
+            <td>
+                @obj.Name
+            </td>
+            <td>
+                @obj.DisplayOrder
+            </td>
+            <td> 
+                <div class="w-75 btn-group" role="group">
+                    <a asp-page="/categories/edit" asp-route-id="@obj.Id" class="btn btn-info mx-2">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                            <a asp-page="/categories/delete" asp-route-id="@obj.Id" class="btn btn-danger mx-2">
+                         <i class="bi bi-trash-fill"></i> Delete
+                    </a>
+                </div>
+            </td>
+        </tr>
+        }
+     
+    </tbody>
+
+
+
+    </table>
+</div>
