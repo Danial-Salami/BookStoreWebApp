@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace BookStoreWebApp.Migrations
+namespace BookStore.DataAccess.Migrations
 {
     /// <inheritdoc />
     public partial class addApplicationDbContextToDb : Migration
