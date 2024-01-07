@@ -4,13 +4,14 @@ using BookStore.DataAccess.Repository.IRepository;
 using BookStore.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BookStoreWebApp.Controllers
+namespace BookStoreWebApp.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
-    {   
-       
+    {
+
         private readonly IUnitOfWork _unitOfWrok;
-        public CategoryController(IUnitOfWork categoryRepository) 
+        public CategoryController(IUnitOfWork categoryRepository)
         {
             _unitOfWrok = categoryRepository;
 
@@ -27,8 +28,9 @@ namespace BookStoreWebApp.Controllers
         }
         [HttpPost]
         public IActionResult Create(Category obj)
-        {   
-            if ( ModelState.IsValid ) {
+        {
+            if (ModelState.IsValid)
+            {
                 _unitOfWrok.Category.Add(obj);
                 _unitOfWrok.Save();
                 TempData["success"] = "Category successfuly created.";
@@ -38,11 +40,12 @@ namespace BookStoreWebApp.Controllers
         }
         public IActionResult Edit(int? id)
         {
-            if (id == null  || id == 0) {
+            if (id == null || id == 0)
+            {
                 return NotFound();
             }
             Category? categoryFromDb = _unitOfWrok.Category.Get(u => u.Id == id);
-            if ( categoryFromDb == null )
+            if (categoryFromDb == null)
             {
                 return NotFound();
             }
@@ -66,31 +69,31 @@ namespace BookStoreWebApp.Controllers
             {
                 return NotFound();
             }
-            Category? categoryFromDb = _unitOfWrok.Category.Get(u=>u.Id==id);
+            Category? categoryFromDb = _unitOfWrok.Category.Get(u => u.Id == id);
             if (categoryFromDb == null)
             {
                 return NotFound();
             }
             return View(categoryFromDb);
         }
-        [HttpPost,ActionName("Delete")]
+        [HttpPost, ActionName("Delete")]
         public IActionResult DeletePost(int? id)
         {
             if (id == null || id == 0)
             {
                 return NotFound();
             }
-            Category? obj = _unitOfWrok.Category.Get(u=>u.Id==id);
+            Category? obj = _unitOfWrok.Category.Get(u => u.Id == id);
             if (obj == null)
             {
                 return NotFound();
             }
-                _unitOfWrok.Category.Remove(obj);
-                _unitOfWrok.Save();
+            _unitOfWrok.Category.Remove(obj);
+            _unitOfWrok.Save();
             TempData["success"] = "Category successfuly deleted.";
             return RedirectToAction("Index");
-            
-           
+
+
         }
     }
 }
