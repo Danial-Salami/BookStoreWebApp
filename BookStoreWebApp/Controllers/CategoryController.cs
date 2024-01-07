@@ -1,5 +1,6 @@
 ﻿
 using BookStore.DataAccess.Data;
+using BookStore.DataAccess.Repository.IRepository;
 using BookStore.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,15 +8,17 @@ namespace BookStoreWebApp.Controllers
 {
     public class CategoryController : Controller
     {   
-        private readonly ApplicationDbContext _dbContext;
-        public CategoryController(ApplicationDbContext dbContext) 
+       
+        private readonly IUnitOfWork _unitOfWrok;
+        public CategoryController(IUnitOfWork categoryRepository) 
         {
-            _dbContext = dbContext;
+            _unitOfWrok = categoryRepository;
+
 
         }
         public IActionResult Index()
         {
-            List<Category> objCategoryList = _dbContext.Categories.ToList();
+            List<Category> objCategoryList = _unitOfWrok.Category.GetAll().ToList();
             return View(objCategoryList);
         }
         public IActionResult Create()
@@ -26,8 +29,8 @@ namespace BookStoreWebApp.Controllers
         public IActionResult Create(Category obj)
         {   
             if ( ModelState.IsValid ) {
-                _dbContext.Categories.Add(obj);
-                _dbContext.SaveChanges();
+                _unitOfWrok.Category.Add(obj);
+                _unitOfWrok.Save();
                 TempData["success"] = "Category successfuly created.";
                 return RedirectToAction("Index");
             }
@@ -38,7 +41,7 @@ namespace BookStoreWebApp.Controllers
             if (id == null  || id == 0) {
                 return NotFound();
             }
-            Category? categoryFromDb = _dbContext.Categories.Find(id);
+            Category? categoryFromDb = _unitOfWrok.Category.Get(u => u.Id == id);
             if ( categoryFromDb == null )
             {
                 return NotFound();
@@ -50,8 +53,8 @@ namespace BookStoreWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _dbContext.Categories.Update(obj);
-                _dbContext.SaveChanges();
+                _unitOfWrok.Category.Update(obj);
+                _unitOfWrok.Save();
                 TempData["success"] = "Category successfuly edited.";
                 return RedirectToAction("Index");
             }
@@ -63,7 +66,7 @@ namespace BookStoreWebApp.Controllers
             {
                 return NotFound();
             }
-            Category? categoryFromDb = _dbContext.Categories.Find(id);
+            Category? categoryFromDb = _unitOfWrok.Category.Get(u=>u.Id==id);
             if (categoryFromDb == null)
             {
                 return NotFound();
@@ -77,13 +80,13 @@ namespace BookStoreWebApp.Controllers
             {
                 return NotFound();
             }
-            Category? obj = _dbContext.Categories.Find(id);
+            Category? obj = _unitOfWrok.Category.Get(u=>u.Id==id);
             if (obj == null)
             {
                 return NotFound();
             }
-                _dbContext.Categories.Remove(obj);
-                _dbContext.SaveChanges();
+                _unitOfWrok.Category.Remove(obj);
+                _unitOfWrok.Save();
             TempData["success"] = "Category successfuly deleted.";
             return RedirectToAction("Index");
             
