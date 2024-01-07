@@ -1,64 +1,59 @@
-﻿
-using BookStore.DataAccess.Data;
-using BookStore.DataAccess.Repository.IRepository;
-using BookStore.Models;
+﻿using BookStore.DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
-
+using BookStore.Models;
+using BookStore.DataAccess.Repository;
 namespace BookStoreWebApp.Areas.Admin.Controllers
-{
+{ 
     [Area("Admin")]
-    public class CategoryController : Controller
+    public class ProductController : Controller
     {
-
+       
         private readonly IUnitOfWork _unitOfWork;
-        public CategoryController(IUnitOfWork categoryRepository)
+        public ProductController(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = categoryRepository;
-
-
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
         {
-            List<Category> objCategoryList = _unitOfWork.Category.GetAll().ToList();
-            return View(objCategoryList);
+            List<Product> objProductList = _unitOfWork.Product.GetAll().ToList();
+            return View(objProductList);
         }
         public IActionResult Create()
         {
             return View();
         }
         [HttpPost]
-        public IActionResult Create(Category obj)
+        public IActionResult Create(Product obj)
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.Category.Add(obj);
+                _unitOfWork.Product.Add(obj);
                 _unitOfWork.Save();
-                TempData["success"] = "Category successfuly Created.";
+                TempData["success"] = "Product successfuly created.";
                 return RedirectToAction("Index");
             }
             return View();
         }
         public IActionResult Edit(int? id)
-        {
-            if (id == null || id == 0)
+        {   if(id == null || id ==0)
             {
                 return NotFound();
             }
-            Category? categoryFromDb = _unitOfWork.Category.Get(u => u.Id == id);
-            if (categoryFromDb == null)
+            Product productFromDb = _unitOfWork.Product.Get(u=>u.Id == id);
+            if (productFromDb == null)
             {
                 return NotFound();
             }
-            return View(categoryFromDb);
+            return View(productFromDb);
         }
         [HttpPost]
-        public IActionResult Edit(Category obj)
+        public IActionResult Edit(Product obj)
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.Category.Update(obj);
+                _unitOfWork.Product.Update(obj);
                 _unitOfWork.Save();
-                TempData["success"] = "Category successfuly Edited.";
+                TempData["success"] = "Product successfuly Edited.";
                 return RedirectToAction("Index");
             }
             return View();
@@ -69,12 +64,12 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            Category? categoryFromDb = _unitOfWork.Category.Get(u => u.Id == id);
-            if (categoryFromDb == null)
+            Product productFromDb = _unitOfWork.Product.Get(u=>u.Id==id);
+            if (productFromDb == null)
             {
                 return NotFound();
             }
-            return View(categoryFromDb);
+            return View(productFromDb);
         }
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePost(int? id)
@@ -83,17 +78,19 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            Category? obj = _unitOfWork.Category.Get(u => u.Id == id);
-            if (obj == null)
+            Product? productFromDb = _unitOfWork.Product.Get(u => u.Id == id);
+            if (productFromDb == null)
             {
                 return NotFound();
             }
-            _unitOfWork.Category.Remove(obj);
+            _unitOfWork.Product.Remove(productFromDb);
             _unitOfWork.Save();
-            TempData["success"] = "Category successfuly Deleted.";
+            TempData["success"] = "Product successfuly Deleted.";
             return RedirectToAction("Index");
 
 
         }
+
     }
+
 }
