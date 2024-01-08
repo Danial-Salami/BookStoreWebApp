@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using BookStore.Models;
 using BookStore.DataAccess.Repository;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Linq;
 namespace BookStoreWebApp.Areas.Admin.Controllers
 { 
     [Area("Admin")]
@@ -16,10 +18,18 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
         public IActionResult Index()
         {
             List<Product> objProductList = _unitOfWork.Product.GetAll().ToList();
+           
             return View(objProductList);
         }
         public IActionResult Create()
         {
+            IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll()
+               .Select(u => new SelectListItem
+               {
+                   Text = u.Name,
+                   Value = u.Id.ToString()
+               });
+            ViewBag.CategoryList = CategoryList;
             return View();
         }
         [HttpPost]
@@ -44,6 +54,13 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+            IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll()
+              .Select(u => new SelectListItem
+              {
+                  Text = u.Name,
+                  Value = u.Id.ToString()
+              });
+            ViewBag.CategoryList = CategoryList;
             return View(productFromDb);
         }
         [HttpPost]
@@ -69,6 +86,13 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+            IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll()
+              .Select(u => new SelectListItem
+              {
+                  Text = u.Name,
+                  Value = u.Id.ToString()
+              });
+            ViewBag.CategoryList = CategoryList;
             return View(productFromDb);
         }
         [HttpPost, ActionName("Delete")]
