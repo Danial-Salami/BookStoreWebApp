@@ -22,7 +22,9 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
         }
         public IActionResult Index()
         {
-            List<Product> objProductList = _unitOfWork.Product.GetAll(includeProperties:"Category").ToList();
+            List<Product> objProductList = _unitOfWork.Product
+                .GetAll(includeProperties:"Category")
+                .ToList();
            
             return View(objProductList);
         }
@@ -30,7 +32,9 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
         {
             ProductVM productVM = new()
             {
-                CategoryList = _unitOfWork.Category.GetAll().Select(u => new SelectListItem
+                CategoryList = _unitOfWork.Category
+                .GetAll()
+                .Select(u => new SelectListItem
                {
                    Text = u.Name,
                    Value = u.Id.ToString()
@@ -64,7 +68,8 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
                     string productPath = Path.Combine(wwwRootPath, @"images\product");
                     if (!string.IsNullOrEmpty(productVM.Product.ImageUrl))
                     {
-                        var oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
+                        var oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl
+                            .TrimStart('\\'));
 
                         if(System.IO.File.Exists(oldImagePath))
                         {
@@ -95,7 +100,8 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
             }
             else
             {
-                productVM.CategoryList = _unitOfWork.Category.GetAll().Select(u => new SelectListItem
+                productVM.CategoryList = _unitOfWork.Category.GetAll()
+                    .Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
@@ -142,7 +148,16 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
 
 
         }
-
+        #region API CALL
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            List<Product> objProductList = _unitOfWork.Product
+                .GetAll(includeProperties: "Category")
+                .ToList();
+            return Json(new {data=objProductList});
+        }
+        #endregion
     }
 
 }
