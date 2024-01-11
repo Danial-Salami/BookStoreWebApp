@@ -87,15 +87,17 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
                 if (productVM.Product.Id == 0 )
                 {
                     _unitOfWork.Product.Add(productVM.Product);
+                    TempData["success"] = "Product successfuly created.";
 
                 }
                 else
                 {
                 _unitOfWork.Product.Update(productVM.Product);
+                    TempData["success"] = "Product successfuly updated.";
 
                 }
                 _unitOfWork.Save();
-                TempData["success"] = "Product successfuly created.";
+              
                 return RedirectToAction("Index");
             }
             else
@@ -109,26 +111,26 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
                 return View(productVM);  
             }     
         }
-        public IActionResult Delete(int? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-            Product productFromDb = _unitOfWork.Product.Get(u=>u.Id==id);
-            if (productFromDb == null)
-            {
-                return NotFound();
-            }
-            IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll()
-              .Select(u => new SelectListItem
-              {
-                  Text = u.Name,
-                  Value = u.Id.ToString()
-              });
-            ViewBag.CategoryList = CategoryList;
-            return View(productFromDb);
-        }
+        //public IActionResult Delete(int? id)
+        //{
+        //    if (id == null || id == 0)
+        //    {
+        //        return NotFound();
+        //    }
+        //    Product productFromDb = _unitOfWork.Product.Get(u=>u.Id==id);
+        //    if (productFromDb == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll()
+        //      .Select(u => new SelectListItem
+        //      {
+        //          Text = u.Name,
+        //          Value = u.Id.ToString()
+        //      });
+        //    ViewBag.CategoryList = CategoryList;
+        //    return View(productFromDb);
+        //}
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePost(int? id)
         {
@@ -156,6 +158,30 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
                 .GetAll(includeProperties: "Category")
                 .ToList();
             return Json(new {data=objProductList});
+        }
+        [HttpDelete]
+        public IActionResult Delete(int? id)
+        {
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            var productToBeDelete = _unitOfWork.Product.Get(u=>u.Id == id);
+            if (productToBeDelete == null) 
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+            if (productToBeDelete.ImageUrl != null)
+            {
+                var oldImagePath = Path.Combine(wwwRootPath, productToBeDelete.ImageUrl.TrimStart('\\'));
+
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
+            }
+            _unitOfWork.Product.Remove(productToBeDelete);
+            _unitOfWork.Save();
+            return Json(new { success = true, message = "Delete Successful" });
+
+
         }
         #endregion
     }
