@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace BookStore.DataAccess.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : identityDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options): base(options)
         {
