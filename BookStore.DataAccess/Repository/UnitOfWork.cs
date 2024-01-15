@@ -13,11 +13,13 @@ namespace BookStore.DataAccess.Repository
         private ApplicationDbContext _dbContext;
         public ICategoryRepository Category { get; private set; }
         public IProductRepository Product { get; private set; }
+        public ICompanyRepository Company { get; private set; }
         public UnitOfWork(ApplicationDbContext dbContext) 
         {
             _dbContext = dbContext;
             Category = new CategoryRepository(dbContext);
             Product = new ProductRepository(dbContext);
+            Company = new CompanyRepository(dbContext);
         }
 
 

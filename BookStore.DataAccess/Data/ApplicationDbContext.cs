@@ -15,6 +15,7 @@ namespace BookStore.DataAccess.Data
         }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Company> Companies { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -112,6 +113,38 @@ namespace BookStore.DataAccess.Data
                     CategoryId = 2,
                     ImageUrl = ""
                 }
+                );
+            modelBuilder.Entity<Company>().HasData(
+                new Company
+                {
+                    Id = 1,
+                    Name = "DigiKala",
+                    State = "Tehran Prov",
+                    City = "Tehran ",
+                    StreetAddress = "Shohada Square-Emam street",
+                    PostalCode = "4848484848",
+                    PhoneNumber = "9118529172",
+                },
+                   new Company
+                   {
+                       Id = 2,
+                       Name = "Ketabrah",
+                       State = "Khorasan Razavi",
+                       City = "Mashhad",
+                       StreetAddress = "Bolvar Emam Reza",
+                       PostalCode = "49494949",
+                       PhoneNumber = "9113565457",
+                   },
+                      new Company
+                      {
+                          Id = 3,
+                          Name = "Amazon",
+                          State = "New York",
+                          City = "New York city",
+                          StreetAddress = "River Bank",
+                          PostalCode = "11111111",
+                          PhoneNumber = "983265786",
+                      }
                 );
         }
     }
