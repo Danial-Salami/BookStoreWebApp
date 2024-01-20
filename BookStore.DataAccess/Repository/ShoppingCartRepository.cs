@@ -18,7 +18,7 @@ namespace BookStore.DataAccess.Repository
         }
         public void Update(ShoppingCart obj)
         {
-            _dbContext.Update(obj);
+            _dbContext.ShoppingCarts.Update(obj);
         }
     }
 }
