@@ -1,6 +1,7 @@
 ﻿using BookStore.DataAccess.Repository.IRepository;
 using BookStore.Models;
 using BookStore.Models.ViewModels;
+using BookStore.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -114,7 +115,7 @@ namespace BookStoreWebApp.Areas.Customer.Controllers
 			ShoppingCartVM.OrderHeader.OrderDate = System.DateTime.Now;
 			ShoppingCartVM.OrderHeader.ApplicationUserId = userId;
 
-			ShoppingCartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
+			ApplicationUser applicationUser = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
 
 
 			foreach (var cart in ShoppingCartVM.ShoppingCartsList)
@@ -123,9 +124,46 @@ namespace BookStoreWebApp.Areas.Customer.Controllers
 
 				ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
 			}
-			return View(ShoppingCartVM);
-		}
+			if (applicationUser.CompanyId.GetValueOrDefault() == 0) 
+			{
+				ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
+				ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
+			}
+			else {
+				//company user
+				ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
+				ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
+			}
+			_unitOfWork.OrderHeader.Add(ShoppingCartVM.OrderHeader);
+			_unitOfWork.Save();
+			foreach(var cart in ShoppingCartVM.ShoppingCartsList)
+			{
+				OrderDetail orderDetail = new()
+				{
+					ProductId = cart.ProductId,
+					OrderHeaderId = ShoppingCartVM.OrderHeader.Id,
+					Count = cart.Count,
+					Price = cart.Price
+				};
+				_unitOfWork.OrderDetail.Add(orderDetail);
+				_unitOfWork.Save();
+			}
+			
+		
+			if (applicationUser.CompanyId.GetValueOrDefault() == 0)
+			{
+			
+			}
 
+
+
+				return RedirectToAction(nameof(OrderConfirmation), new {id=ShoppingCartVM.OrderHeader.Id});
+			}
+
+		public IActionResult OrderConfirmation(int? id)
+		{
+			return View(id);
+		}
 		private double GetPriceBasedOnQuantity(ShoppingCart shoppingCart)
 		{
 			if (shoppingCart.Count <= 50)
