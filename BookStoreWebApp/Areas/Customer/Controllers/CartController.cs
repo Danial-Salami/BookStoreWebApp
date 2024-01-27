@@ -151,7 +151,7 @@ namespace BookStoreWebApp.Areas.Customer.Controllers
 			
 		
 			if (applicationUser.CompanyId.GetValueOrDefault() == 0)
-			{
+			{//stripe
 			
 			}
 

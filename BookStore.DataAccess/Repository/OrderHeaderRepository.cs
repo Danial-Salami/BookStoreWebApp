@@ -21,6 +21,17 @@ namespace BookStore.DataAccess.Repository
         public void Update(OrderHeader obj)
         {
             _dbContext.OrderHeaders.Update(obj);
-        }
-    }
+		
+
+		}
+
+		public void UpdateStatus(int id, string orderStatus, string? paymentStatus = null)
+		{
+			_dbContext.OrderHeaders.
+		}
+
+		public void UpdateStripPaymentId(int id, string sessionId, string paymentIntentId)
+		{
+		}
+	}
 }

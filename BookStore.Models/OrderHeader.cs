@@ -25,7 +25,8 @@ namespace BookStore.Models
 		public string? Carrier { get; set; }
 		public DateTime PaymentDate { get; set; }
 		public DateOnly PaymentDueDate { get; set; }
-		public int PaymentIntentId { get; set; }
+		public int? SessionId { get; set; }
+		public int? PaymentIntentId { get; set; }
 		[Required]
 		public string? Name { get; set; }
 		[Required]
