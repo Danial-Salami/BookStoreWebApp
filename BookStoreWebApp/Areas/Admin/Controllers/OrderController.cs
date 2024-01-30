@@ -30,6 +30,10 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
 			
             return View(orderVM);
         }
+        public IActionResult UpdateOrderDetails()
+        {
+            return View();
+        }
         #region API CALL
         [HttpGet]
 		public IActionResult GetAll(string status)
