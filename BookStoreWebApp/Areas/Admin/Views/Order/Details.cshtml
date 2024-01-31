@@ -1,5 +1,6 @@
 ﻿@model OrderVM
 <form method="post">
+    <input asp-for="OrderHeader.Id" hidden  />
     <br />
     <div class="container">
         <div class="card">
@@ -150,7 +151,6 @@
                                     @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
                                     {
                                         <input asp-for="OrderHeader.TrackingNumber" type="text" class="form-control" />
-
                                     }
                                     else
                                     {
@@ -176,18 +176,13 @@
                                 <div class="row my-1">
                                     <div class="col-3">Session ID</div>
                                     <div class="col-9">
-
                                         <input asp-for="OrderHeader.SessionId" readonly type="text" class="form-control" />
-
                                     </div>
                                 </div>
                                 <div class="row my-1">
                                     <div class="col-3">Payment Intent ID</div>
                                     <div class="col-9">
-
-                                        <input asp-for="OrderHeader.PaymentIntentId" readonly type="text" class="form-control" />
-
-
+                                       <input asp-for="OrderHeader.PaymentIntentId" readonly type="text" class="form-control" />
                                     </div>
                                 </div>
                             }
@@ -206,17 +201,16 @@
                                 <div class="col-9">
                                     <input asp-for="OrderHeader.PaymentStatus" readonly type="text" class="form-control" />
                                 </div>
-                            </div>
-                            <input type="submit" class="btn btn-warning form-control my-1" value="Update Order Details" />
-
-
+                            </div> 
+                            @if(User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee)){
+                                <button type="submit" asp-action="UpdateOrderDetails" class="btn btn-warning form-control my-1">Update Order Details</button>
+                            }
                         </div>
                         <div class="col-12 col-lg-5 offset-lg-1">
                             <h4 class="d-flex justify-content-between align-items-center mb-3">
                                 <span class="text-primary">Order Summary</span>
                             </h4>
                             <label class="btn btn-outline-primary form-control my-2">Order Status - @Model.OrderHeader.OrderStatus</label>
-
                             <ul class="list-group mb-3">
                                 @foreach (var detail in Model.OrderDetail)
                                 {
@@ -232,9 +226,7 @@
                                                 <p class="text-success">@((detail.Count * detail.Price).ToString("c"))</p>
                                             </div>
                                         </div>
-                                    </li>
-
-                                    
+                                    </li> 
                                 }
                                 <li class="list-group-item bg-info">
                                     <div class="row container">
@@ -247,7 +239,6 @@
                                     </div>
                                 </li>
                             </ul>
-
                             <input type="submit" class="btn btn-primary form-control my-1" value="Start Processing" />
                             <input type="submit" class="btn btn-primary form-control my-1" value="Ship Order" />
                             <input type="submit" class="btn btn-success form-control my-1" value="Pay Now" />

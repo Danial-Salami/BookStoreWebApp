@@ -5,16 +5,20 @@ using BookStore.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Stripe.Climate;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace BookStoreWebApp.Areas.Admin.Controllers
 {
-    [Authorize(Roles = SD.Role_Admin)]
+	[Authorize]
     [Area("admin")]
 	public class OrderController(IUnitOfWork unitOfWork) : Controller
 	{
 
 		private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        [BindProperty]
+		public OrderVM OrderVM { get; set; }
 
 		public IActionResult Index()
 		{
@@ -22,25 +26,63 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
 		}
         public IActionResult Details(int orderId)
         {
-			OrderVM orderVM = new()
+			 OrderVM = new()
 			{
 				OrderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == orderId, includeProperties: "ApplicationUser"),
 				OrderDetail = _unitOfWork.OrderDetail.GetAll(u => u.OrderHeaderId == orderId, includeProperties: "Product")
 			};
 			
-            return View(orderVM);
+            return View(OrderVM);
         }
+		[HttpPost]
+		[Authorize(Roles =SD.Role_Admin+","+SD.Role_Employee)]
         public IActionResult UpdateOrderDetails()
         {
-            return View();
+			var orderHeaderFromDb = _unitOfWork.OrderHeader.Get(u => u.Id == OrderVM.OrderHeader.Id);
+
+			orderHeaderFromDb.Name = OrderVM.OrderHeader.Name;
+			orderHeaderFromDb.PhoneNumber= OrderVM.OrderHeader.PhoneNumber;
+	
+			orderHeaderFromDb.PaymentDate = OrderVM.OrderHeader.PaymentDate;
+			orderHeaderFromDb.City = OrderVM.OrderHeader.City;
+			orderHeaderFromDb.State= OrderVM.OrderHeader.State;
+			orderHeaderFromDb.StreetAddress= OrderVM.OrderHeader.StreetAddress;
+			orderHeaderFromDb.PostalCode= OrderVM.OrderHeader.PostalCode;
+			if (!string.IsNullOrEmpty(OrderVM.OrderHeader.Carrier)){
+				orderHeaderFromDb.Carrier= OrderVM.OrderHeader.Carrier;	
+			}
+            if (!string.IsNullOrEmpty(OrderVM.OrderHeader.TrackingNumber)){
+                orderHeaderFromDb.TrackingNumber = OrderVM.OrderHeader.TrackingNumber;
+            }
+			_unitOfWork.OrderHeader.Update(orderHeaderFromDb);
+			_unitOfWork.Save();
+			TempData["Success"] = "Order Details Updated Successfully";
+
+            return RedirectToAction(nameof(Details), new { orderId =orderHeaderFromDb.Id});
         }
         #region API CALL
         [HttpGet]
 		public IActionResult GetAll(string status)
 		{
-			IEnumerable<OrderHeader> objOrderHeaders = _unitOfWork.OrderHeader
-				.GetAll(includeProperties: "ApplicationUser")
-				.ToList();
+			IEnumerable<OrderHeader> objOrderHeaders;
+		
+
+
+
+			if(User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
+			{
+				 objOrderHeaders = _unitOfWork.OrderHeader
+                .GetAll(includeProperties: "ApplicationUser")
+                .ToList();
+            } else
+			{
+                var claimsIdentity = (ClaimsIdentity)User.Identity;
+                var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+                objOrderHeaders = _unitOfWork.OrderHeader
+					.GetAll(u=>u.ApplicationUserId==userId,includeProperties: "ApplicationUser")
+					.ToList();
+            }
+         
             switch (status)
             {
                 case "inprocess":
