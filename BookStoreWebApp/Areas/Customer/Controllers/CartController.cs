@@ -3,6 +3,7 @@ using BookStore.Models;
 using BookStore.Models.ViewModels;
 using BookStore.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Stripe.Checkout;
 using System.Security.Claims;
@@ -14,11 +15,13 @@ namespace BookStoreWebApp.Areas.Customer.Controllers
 	public class CartController : Controller
 	{
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly IEmailSender _emailSender;
 		[BindProperty]
 		public ShoppingCartVM ShoppingCartVM { get; set; }
-		public CartController(IUnitOfWork unitOfWork)
+		public CartController(IUnitOfWork unitOfWork,IEmailSender email)
 		{
 			_unitOfWork = unitOfWork;
+			_emailSender = email;	
 		}
 
 		public IActionResult Index()
@@ -211,7 +214,8 @@ namespace BookStoreWebApp.Areas.Customer.Controllers
 				_unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
 				_unitOfWork.Save();
 			}
-		
+			_emailSender.SendEmailAsync(orderHeader.ApplicationUser.Email, "New Order has been placed---BookStore",
+			$"<p>New Order Created => Order Id = {orderHeader.Id}</p>");
 			return View(id);
 		}
 		private double GetPriceBasedOnQuantity(ShoppingCart shoppingCart)
